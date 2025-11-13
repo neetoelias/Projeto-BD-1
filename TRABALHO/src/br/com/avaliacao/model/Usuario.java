@@ -1,14 +1,12 @@
 package br.com.avaliacao.model;
 
-
 public class Usuario {
     
     private Integer idUsuario;
     private String nome;
     private String email;
     private String senhaHash;
-    private String tipoUsuario; 
-    
+    private String tipoUsuario;
     
     public Usuario(Integer idUsuario, String nome, String email, String senhaHash, String tipoUsuario) {
         this.idUsuario = idUsuario;
@@ -18,7 +16,6 @@ public class Usuario {
         this.tipoUsuario = tipoUsuario;
     }
 
-    
     public Usuario(String nome, String email, String senhaHash, String tipoUsuario) {
         this.nome = nome;
         this.email = email;
@@ -26,10 +23,7 @@ public class Usuario {
         this.tipoUsuario = tipoUsuario;
     }
     
-    
     public Usuario() {}
-
-    
 
     public Integer getIdUsuario() { return idUsuario; }
     public void setIdUsuario(Integer idUsuario) { this.idUsuario = idUsuario; }
@@ -46,7 +40,7 @@ public class Usuario {
     public String getTipoUsuario() { return tipoUsuario; }
     public void setTipoUsuario(String tipoUsuario) { this.tipoUsuario = tipoUsuario; }
 
-    
+    // Opcional: Para facilitar a depuração.
     @Override
     public String toString() {
         return "Usuario [id=" + idUsuario + ", nome=" + nome + ", tipo=" + tipoUsuario + "]";

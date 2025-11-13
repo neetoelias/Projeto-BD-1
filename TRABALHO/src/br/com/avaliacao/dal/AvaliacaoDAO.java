@@ -1,6 +1,7 @@
 package br.com.avaliacao.dal;
 
 import br.com.avaliacao.model.Avaliacao;
+import br.com.avaliacao.model.ItemAvaliacao;
 import br.com.avaliacao.model.Questao;
 import br.com.avaliacao.util.DBConnection;
 
@@ -14,78 +15,64 @@ import java.sql.Timestamp;
 public class AvaliacaoDAO {
 
     public Avaliacao cadastrar(Avaliacao avaliacao) throws SQLException {
-        
-        
         String sqlAvaliacao = "INSERT INTO AVALIACAO (descricao, data_abertura, data_fechamento, valor_total, id_professor, id_disciplina) " +
-                              "VALUES (?, ?, ?, ?, ?, ?) RETURNING id_avaliacao";
-        
-        String sqlQuestaoVinculo = "INSERT INTO AVALIACAO_QUESTAO (id_avaliacao, id_questao) VALUES (?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?)";
+
+
+        String sqlItem = "INSERT INTO ITEM_AVALIACAO (id_avaliacao, id_questao, valor_pontuacao) VALUES (?, ?, ?)";
 
         Connection conn = null;
-        PreparedStatement stmtAvaliacao = null;
-        PreparedStatement stmtQuestao = null;
+        PreparedStatement psAvaliacao = null;
+        PreparedStatement psItem = null;
         ResultSet rs = null;
 
         try {
             conn = DBConnection.getConnection();
-            conn.setAutoCommit(false); 
+            conn.setAutoCommit(false);
 
-           
-            stmtAvaliacao = conn.prepareStatement(sqlAvaliacao, Statement.RETURN_GENERATED_KEYS);
-            
-            
-            stmtAvaliacao.setString(1, avaliacao.getTitulo()); 
-           
-            stmtAvaliacao.setTimestamp(2, Timestamp.valueOf(avaliacao.getDataCriacao()));
-          
-            stmtAvaliacao.setTimestamp(3, Timestamp.valueOf(avaliacao.getDataLimite()));
-          
-            stmtAvaliacao.setDouble(4, avaliacao.getValorTotal());
-            
-            stmtAvaliacao.setInt(5, avaliacao.getIdProfessor());
-           
-            stmtAvaliacao.setInt(6, avaliacao.getIdDisciplina());
+            psAvaliacao = conn.prepareStatement(sqlAvaliacao, PreparedStatement.RETURN_GENERATED_KEYS);
+            psAvaliacao.setString(1, avaliacao.getTitulo());
+            psAvaliacao.setObject(2, avaliacao.getDataCriacao().toLocalDate());
+            psAvaliacao.setObject(3, avaliacao.getDataLimite().toLocalDate());
+            psAvaliacao.setDouble(4, avaliacao.getValorTotal());
+            psAvaliacao.setInt(5, avaliacao.getIdProfessor());
+            psAvaliacao.setInt(6, avaliacao.getIdDisciplina());
 
-            int rowsAffected = stmtAvaliacao.executeUpdate();
+            psAvaliacao.executeUpdate();
+            rs = psAvaliacao.getGeneratedKeys();
 
-             if (rowsAffected > 0) {
-                rs = stmtAvaliacao.getGeneratedKeys(); 
-                if (rs.next()) {
-                    avaliacao.setIdAvaliacao(rs.getInt(1)); 
-                }
+            if (rs.next()) {
+                avaliacao.setIdAvaliacao(rs.getInt(1)); // Pega o ID da avaliação recém-criada
             } else {
-                conn.rollback();
-                throw new SQLException("Falha ao cadastrar a Avaliação principal.");
-            }
-            
-            // B) Inserir o vínculo com as Questões
-            if (avaliacao.getQuestoes() != null && !avaliacao.getQuestoes().isEmpty()) {
-                stmtQuestao = conn.prepareStatement(sqlQuestaoVinculo);
-                
-                for (Questao questao : avaliacao.getQuestoes()) {
-                    stmtQuestao.setInt(1, avaliacao.getIdAvaliacao());
-                    if (questao.getIdQuestao() != null) { 
-                        stmtQuestao.setInt(2, questao.getIdQuestao());
-                        stmtQuestao.addBatch();
-                    }
-                }
-                
-                stmtQuestao.executeBatch();
+                throw new SQLException("Falha ao cadastrar avaliação, nenhum ID retornado.");
             }
 
-            conn.commit(); 
-            return avaliacao;
+            if (avaliacao.getItens() != null && !avaliacao.getItens().isEmpty()) {
+                psItem = conn.prepareStatement(sqlItem);
+
+                for (ItemAvaliacao item : avaliacao.getItens()) {
+                    psItem.setInt(1, avaliacao.getIdAvaliacao());
+                    psItem.setInt(2, item.getIdQuestao());
+                    psItem.setDouble(3, item.getValorPontuacao());
+
+                    psItem.addBatch();
+                }
+                psItem.executeBatch();
+            }
+
+            conn.commit();
+            System.out.println("Conexão PostgreSQL estabelecida com sucesso!");
 
         } catch (SQLException e) {
-            if (conn != null) {
-                conn.rollback(); 
-            }
+            if (conn != null) conn.rollback();
             throw e;
         } finally {
+            if (psItem != null) psItem.close();
             if (rs != null) rs.close();
-            if (stmtAvaliacao != null) stmtAvaliacao.close();
-            if (stmtQuestao != null) stmtQuestao.close();
-            if (conn != null) conn.setAutoCommit(true); 
+            if (psAvaliacao != null) psAvaliacao.close();
+            if (conn != null) conn.close();
         }
+
+        return avaliacao;
     }
 }

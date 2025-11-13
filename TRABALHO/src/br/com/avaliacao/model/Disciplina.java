@@ -4,7 +4,7 @@ public class Disciplina {
     
     private Integer idDisciplina;
     private String nome;
-    private String codigo; 
+    private String codigo;
 
     public Disciplina() {}
 
@@ -13,14 +13,12 @@ public class Disciplina {
         this.codigo = codigo;
     }
 
-   
     public Disciplina(Integer idDisciplina, String nome, String codigo) {
         this.idDisciplina = idDisciplina;
         this.nome = nome;
         this.codigo = codigo;
     }
 
-    
     public Integer getIdDisciplina() { return idDisciplina; }
     public void setIdDisciplina(Integer idDisciplina) { this.idDisciplina = idDisciplina; }
     
