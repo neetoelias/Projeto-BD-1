@@ -40,7 +40,6 @@ public class Usuario {
     public String getTipoUsuario() { return tipoUsuario; }
     public void setTipoUsuario(String tipoUsuario) { this.tipoUsuario = tipoUsuario; }
 
-    // Opcional: Para facilitar a depuração.
     @Override
     public String toString() {
         return "Usuario [id=" + idUsuario + ", nome=" + nome + ", tipo=" + tipoUsuario + "]";

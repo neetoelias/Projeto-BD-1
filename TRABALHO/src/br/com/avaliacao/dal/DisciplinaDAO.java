@@ -58,4 +58,18 @@ public class DisciplinaDAO {
             if (conn != null) conn.close();
         }
     }
+    public java.util.List<Disciplina> listarTodas() throws SQLException {
+        String sql = "SELECT * FROM DISCIPLINA";
+        java.util.List<Disciplina> lista = new java.util.ArrayList<>();
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                lista.add(new Disciplina(rs.getInt("id_disciplina"), rs.getString("nome"), rs.getString("codigo")));
+            }
+        }
+        return lista;
+    }
 }

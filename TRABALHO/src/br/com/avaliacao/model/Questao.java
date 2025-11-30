@@ -9,25 +9,40 @@ public class Questao {
     private String tipoQuestao;
     private Integer idProfessor;
 
+  
+    private Integer idDisciplina;
+
     private String gabaritoTexto;
-
     private List<Opcao> opcoes;
-
 
     public Questao() {}
 
-    public Questao(String descricao, String tipoQuestao, Integer idProfessor) {
+    
+    public Questao(String descricao, String tipoQuestao, Integer idProfessor, Integer idDisciplina) {
         this.descricao = descricao;
         this.tipoQuestao = tipoQuestao;
         this.idProfessor = idProfessor;
+        this.idDisciplina = idDisciplina; 
     }
 
+    
     public Questao(Integer idQuestao, String descricao, String tipoQuestao, Integer idProfessor) {
+        
         this.idQuestao = idQuestao;
         this.descricao = descricao;
         this.tipoQuestao = tipoQuestao;
         this.idProfessor = idProfessor;
     }
+
+   
+    public Questao(Integer idQuestao, String descricao, String tipoQuestao, Integer idProfessor, Integer idDisciplina) {
+        this.idQuestao = idQuestao;
+        this.descricao = descricao;
+        this.tipoQuestao = tipoQuestao;
+        this.idProfessor = idProfessor;
+        this.idDisciplina = idDisciplina;
+    }
+
 
     public Integer getIdQuestao() { return idQuestao; }
     public void setIdQuestao(Integer idQuestao) { this.idQuestao = idQuestao; }
@@ -41,27 +56,22 @@ public class Questao {
     public Integer getIdProfessor() { return idProfessor; }
     public void setIdProfessor(Integer idProfessor) { this.idProfessor = idProfessor; }
 
-    public String getGabaritoTexto() {
-        return gabaritoTexto;
-    }
+  
+    public Integer getIdDisciplina() { return idDisciplina; }
+    public void setIdDisciplina(Integer idDisciplina) { this.idDisciplina = idDisciplina; }
 
-    public void setGabaritoTexto(String gabaritoTexto) {
-        this.gabaritoTexto = gabaritoTexto;
-    }
+    public String getGabaritoTexto() { return gabaritoTexto; }
+    public void setGabaritoTexto(String gabaritoTexto) { this.gabaritoTexto = gabaritoTexto; }
 
-    public List<Opcao> getOpcoes() {
-        return opcoes;
-    }
-
-    public void setOpcoes(List<Opcao> opcoes) {
-        this.opcoes = opcoes;
-    }
+    public List<Opcao> getOpcoes() { return opcoes; }
+    public void setOpcoes(List<Opcao> opcoes) { this.opcoes = opcoes; }
 
     @Override
     public String toString() {
         return "Questao [id=" + idQuestao +
                 ", tipo=" + tipoQuestao +
                 ", professorId=" + idProfessor +
+                ", disciplinaId=" + idDisciplina + 
                 ", gabaritoTexto=" + (gabaritoTexto != null ? "Sim" : "Nao") +
                 ", numOpcoes=" + (opcoes != null ? opcoes.size() : 0) + "]";
     }

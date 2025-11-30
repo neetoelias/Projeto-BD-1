@@ -62,4 +62,75 @@ public class RespostaDAO {
 
         return resposta;
     }
+
+    
+
+    public java.util.List<br.com.avaliacao.model.dto.ItemCorrecao> buscarParaCorrecao(Integer idRealizacao) throws SQLException {
+        java.util.List<br.com.avaliacao.model.dto.ItemCorrecao> lista = new java.util.ArrayList<>();
+
+        String sql = "SELECT " +
+                "  r.id_resposta, q.descricao AS enunciado, q.tipo_questao, " +
+                "  r.resposta_texto, r.nota_obtida, " +
+                "  q.gabarito_texto, " +
+                "  op_aluno.descricao_opcao AS opcao_aluno, " +
+                "  op_gabarito.descricao_opcao AS opcao_gabarito, " +
+                "  item.valor_pontuacao " +
+                "FROM RESPOSTA_QUESTAO r " +
+                "JOIN REALIZACAO_AVALIACAO rea ON r.id_realizacao = rea.id_realizacao " +
+                "JOIN QUESTAO q ON r.id_questao = q.id_questao " +
+                "JOIN ITEM_AVALIACAO item ON (item.id_questao = q.id_questao AND item.id_avaliacao = rea.id_avaliacao) " +
+                "LEFT JOIN OPCAO op_aluno ON r.id_opcao_escolhida = op_aluno.id_opcao " +
+                "LEFT JOIN OPCAO op_gabarito ON (q.id_questao = op_gabarito.id_questao AND op_gabarito.esta_correta = true)";
+
+        sql += " WHERE r.id_realizacao = ? ORDER BY r.id_resposta";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, idRealizacao);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String tipo = rs.getString("tipo_questao");
+                String respAluno = "";
+                String gabarito = "";
+
+                if ("MULTIPLA_ESCOLHA".equals(tipo)) {
+                    respAluno = rs.getString("opcao_aluno");
+                    gabarito = rs.getString("opcao_gabarito");
+                } else {
+                    respAluno = rs.getString("resposta_texto");
+                    gabarito = rs.getString("gabarito_texto");
+                }
+
+               
+                Double valorPontuacao = rs.getBigDecimal("valor_pontuacao") != null ?
+                        rs.getBigDecimal("valor_pontuacao").doubleValue() : 0.0;
+
+                Double notaObtida = rs.getBigDecimal("nota_obtida") != null ?
+                        rs.getBigDecimal("nota_obtida").doubleValue() : null;
+
+                lista.add(new br.com.avaliacao.model.dto.ItemCorrecao(
+                        rs.getInt("id_resposta"),
+                        rs.getString("enunciado"),
+                        tipo,
+                        respAluno,
+                        gabarito,
+                        valorPontuacao, 
+                        notaObtida      
+                ));
+            }
+        }
+        return lista;
+    }
+
+    public void atualizarNota(Integer idResposta, Double nota) throws SQLException {
+        String sql = "UPDATE RESPOSTA_QUESTAO SET nota_obtida = ? WHERE id_resposta = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDouble(1, nota);
+            ps.setInt(2, idResposta);
+            ps.executeUpdate();
+        }
+    }
 }

@@ -2,10 +2,6 @@ package br.com.avaliacao.model;
 
 import java.time.LocalDateTime;
 
-/**
- * Representa a tabela REALIZACAO_AVALIACAO, que é a "tentativa"
- * de um aluno em uma avaliação.
- */
 public class RealizacaoAvaliacao {
 
     private Integer idRealizacao;
